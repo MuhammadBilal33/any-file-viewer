@@ -1,9 +1,17 @@
 {
   "name": "any-file-viewer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Universal in-browser file viewer: PDF, Word, Excel, PowerPoint, CSV, images, video, audio, text, code, HTML and ZIP. Framework-agnostic core with a React wrapper.",
   "license": "MIT",
   "author": "Muhammad Bilal",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MuhammadBilal33/any-file-viewer.git"
+  },
+  "homepage": "https://github.com/MuhammadBilal33/any-file-viewer#readme",
+  "bugs": {
+    "url": "https://github.com/MuhammadBilal33/any-file-viewer/issues"
+  },
   "type": "module",
   "sideEffects": [
     "*.css"

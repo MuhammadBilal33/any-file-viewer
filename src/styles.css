@@ -61,6 +61,14 @@
   }
 }
 
+/* The React host is a flex box, often sized by its parent's flex with only a max-height (a modal).
+   There `height: 100%` falls back to the content height and a long document overflows the host.
+   Stretching takes the host's real height instead, so the viewer scrolls inside it. */
+.fv-react-host > .fv-root {
+  height: auto;
+  align-self: stretch;
+}
+
 .fv-root *,
 .fv-root *::before,
 .fv-root *::after {

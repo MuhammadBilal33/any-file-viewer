@@ -65,5 +65,11 @@ export const FileViewer = forwardRef<FileViewerHandle, FileViewerProps>(function
     else viewer.clear();
   }, [source]);
 
-  return <div ref={hostRef} className={className} style={{ display: "flex", minHeight: 0, ...style }} />;
+  return (
+    <div
+      ref={hostRef}
+      className={className ? `fv-react-host ${className}` : "fv-react-host"}
+      style={{ display: "flex", minHeight: 0, ...style }}
+    />
+  );
 });

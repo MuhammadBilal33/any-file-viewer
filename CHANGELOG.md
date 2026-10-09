@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.1 - 2026-10-09
+
+- Fixed: with the React component inside a box that only has a max-height (a modal, for example),
+  a long document grew past the box and covered what sat below it. The viewer now takes the box's
+  real height and scrolls inside it.
+- Added the GitHub repository, homepage and issues links to the package.
+
 ## 0.1.0 - 2026-10-09
 
 First version.
