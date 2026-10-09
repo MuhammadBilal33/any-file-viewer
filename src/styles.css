@@ -447,7 +447,8 @@
 .fv-tabs {
   position: sticky;
   top: 0;
-  z-index: 3;
+  left: 0;
+  z-index: 4;
   display: flex;
   gap: 2px;
   padding: 6px 8px 0;
@@ -469,22 +470,27 @@
   font-weight: 600;
 }
 
+/* Not a scroll box of its own: the viewer body scrolls both ways, so the sideways scrollbar stays in
+   view (it used to sit under the last row) and the sticky header and row numbers stick to the body. */
 .fv-grid-scroll {
-  overflow: auto;
-  max-width: 100%;
-  background: var(--fv-bg);
+  width: max-content;
+  min-width: 100%;
+  padding: 12px 16px;
 }
 
 .fv-grid {
   border-collapse: separate;
   border-spacing: 0;
+  border-top: 1px solid var(--fv-border);
+  border-left: 1px solid var(--fv-border);
+  background: var(--fv-bg);
   font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
 .fv-grid th,
 .fv-grid td {
-  max-width: 360px;
+  max-width: 420px;
   padding: 4px 8px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -495,11 +501,14 @@
   vertical-align: top;
 }
 
+/* Sticky cells sit over scrolling rows, so the tint is laid on a solid base: a see-through
+   --fv-surface (themes often use one) would let the rows show through. */
 .fv-grid thead th {
   position: sticky;
-  top: 0;
+  top: var(--fv-sticky-top, 0px);
   z-index: 2;
-  background: var(--fv-surface);
+  background-color: var(--fv-bg);
+  background-image: linear-gradient(var(--fv-surface), var(--fv-surface));
   color: var(--fv-muted);
   font-weight: 600;
 }
@@ -508,7 +517,8 @@
   position: sticky;
   left: 0;
   z-index: 1;
-  background: var(--fv-surface);
+  background-color: var(--fv-bg);
+  background-image: linear-gradient(var(--fv-surface), var(--fv-surface));
   color: var(--fv-muted);
   font-weight: 400;
   text-align: right;
@@ -519,11 +529,18 @@
   z-index: 3;
 }
 
+/* Stays under the visible part of the table when it is scrolled sideways. */
+.fv-grid-footer,
+.fv-grid-scroll ~ .fv-note {
+  position: sticky;
+  left: 0;
+}
+
 .fv-grid-footer {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 16px;
+  padding: 0 16px 12px;
 }
 
 .fv-grid-footer[hidden] {

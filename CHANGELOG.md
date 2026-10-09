@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.2 - 2026-10-09
+
+- Fixed: wide CSV, Excel and ZIP tables showed no sideways scrollbar (it sat under the last row),
+  so the right-hand columns looked cut off. The viewer area now scrolls both ways.
+- Fixed: the header row and the row numbers now stay in place while scrolling. In Excel the header
+  row sits under the sheet tabs.
+- Tables have padding and an outer border instead of touching the edges.
+- Long cells still end in "…" but show their full text on hover. Columns may be a bit wider.
+
 ## 0.1.1 - 2026-10-09
 
 - Fixed: with the React component inside a box that only has a max-height (a modal, for example),

@@ -90,6 +90,9 @@ export const spreadsheetRenderer: Renderer = {
       select(next);
     };
     tabs.addEventListener("keydown", onTabKey);
+    // The tab bar sticks to the top too, so the sticky header row sits just under it. Measured
+    // after the tab buttons are in, or the bar is still empty and too short.
+    if (names.length > 1) panel.style.setProperty("--fv-sticky-top", `${tabs.offsetHeight}px`);
 
     select(0);
     return () => {

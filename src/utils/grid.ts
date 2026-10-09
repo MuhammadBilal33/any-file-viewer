@@ -13,6 +13,9 @@ export interface GridOptions {
   totalRows?: number;
 }
 
+/** Cells longer than this may be cut with "…" at the column's max width, so they get a tooltip. */
+const LONG_CELL_CHARS = 40;
+
 /**
  * Table that adds rows in pages, so a 100,000-row sheet costs the same to open as a 500-row one.
  * Every cell is set with textContent, so cell values can never become HTML.
@@ -60,7 +63,10 @@ export function mountGrid(container: HTMLElement, options: GridOptions): () => v
       tr.append(number);
       for (let c = 0; c < columnCount; c += 1) {
         const td = document.createElement("td");
-        td.textContent = row[c] ?? "";
+        const value = row[c] ?? "";
+        td.textContent = value;
+        // Long cells are cut with "…"; the tooltip shows the whole value.
+        if (value.length > LONG_CELL_CHARS) td.title = value;
         tr.append(td);
       }
       fragment.append(tr);
