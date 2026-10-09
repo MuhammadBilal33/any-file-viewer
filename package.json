@@ -1,0 +1,89 @@
+{
+  "name": "any-file-viewer",
+  "version": "0.1.0",
+  "description": "Universal in-browser file viewer: PDF, Word, Excel, PowerPoint, CSV, images, video, audio, text, code, HTML and ZIP. Framework-agnostic core with a React wrapper.",
+  "license": "MIT",
+  "author": "Muhammad Bilal",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "npm run clean && tsc -p tsconfig.json && node scripts/copy-assets.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "demo": "npm run build && node demo/server.mjs",
+    "test": "npm run build && node --test \"tests/**/*.test.mjs\"",
+    "prepublishOnly": "npm test"
+  },
+  "peerDependencies": {
+    "docx-preview": ">=0.3.0",
+    "jszip": ">=3.10.0",
+    "pdfjs-dist": ">=5.0.0 <7",
+    "react": ">=18",
+    "xlsx": ">=0.18.5"
+  },
+  "peerDependenciesMeta": {
+    "docx-preview": {
+      "optional": true
+    },
+    "jszip": {
+      "optional": true
+    },
+    "pdfjs-dist": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "xlsx": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "file-viewer",
+    "document-viewer",
+    "pdf",
+    "docx",
+    "xlsx",
+    "pptx",
+    "csv",
+    "preview"
+  ],
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "docx-preview": "^0.4.1",
+    "jszip": "^3.10.1",
+    "pdfjs-dist": "^5.4.296",
+    "react": "^19.3.0",
+    "typescript": "^5.9.3",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  }
+}

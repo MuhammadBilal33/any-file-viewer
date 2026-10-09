@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>File Viewer Test</title>
+    <link rel="stylesheet" href="/dist/styles.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "pdfjs-dist": "/node_modules/pdfjs-dist/build/pdf.mjs",
+          "docx-preview": "/node_modules/docx-preview/dist/docx-preview.mjs",
+          "xlsx": "/node_modules/xlsx/xlsx.mjs",
+          "jszip": "/demo/jszip-shim.js"
+        }
+      }
+    </script>
+    <script src="/node_modules/jszip/dist/jszip.min.js"></script>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        height: 100vh;
+        background: Canvas;
+        color: CanvasText;
+      }
+      aside {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 16px;
+        overflow: auto;
+        border-right: 1px solid #8884;
+      }
+      h1 {
+        margin: 0;
+        font-size: 18px;
+      }
+      h2 {
+        margin: 0 0 6px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        opacity: 0.7;
+      }
+      .drop {
+        display: block;
+        padding: 18px;
+        border: 2px dashed #8888;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+      }
+      .drop.over {
+        border-color: #2563eb;
+        background: #2563eb22;
+      }
+      .samples {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+        font-size: 13px;
+      }
+      .row {
+        display: flex;
+        gap: 6px;
+      }
+      .row input {
+        flex: 1;
+        min-width: 0;
+      }
+      #log {
+        margin: 0;
+        padding: 8px;
+        min-height: 120px;
+        max-height: 240px;
+        overflow: auto;
+        border-radius: 6px;
+        background: #8881;
+        font: 12px/1.4 ui-monospace, monospace;
+        white-space: pre-wrap;
+      }
+      main {
+        display: flex;
+        min-width: 0;
+        min-height: 0;
+      }
+      @media (max-width: 760px) {
+        body {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto 1fr;
+        }
+        aside {
+          max-height: 45vh;
+          border-right: 0;
+          border-bottom: 1px solid #8884;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <aside>
+      <h1>File viewer test page</h1>
+
+      <section>
+        <h2>Your own file</h2>
+        <label class="drop" id="drop">
+          Drop a file here, or click to pick one
+          <input type="file" id="picker" hidden />
+        </label>
+      </section>
+
+      <section>
+        <h2>Sample files</h2>
+        <div class="samples" id="samples"></div>
+      </section>
+
+      <section>
+        <h2>Open a link</h2>
+        <div class="row">
+          <input id="url" type="url" placeholder="https://… or /demo/samples/…" />
+          <button id="open-url" type="button">Open</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Settings</h2>
+        <div class="row">
+          <label>Theme
+            <select id="theme">
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
+          <label>Limit (MB)
+            <input id="limit" type="number" min="0.01" step="0.5" value="50" style="width: 70px" />
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Events</h2>
+        <pre id="log" aria-live="polite"></pre>
+      </section>
+    </aside>
+
+    <main id="viewer"></main>
+
+    <script type="module">
+      import { createFileViewer } from "/dist/index.js";
+
+      const SAMPLES = ["manual.pdf", "letter.docx", "deck.pptx", "customers.csv", "report.xlsx", "config.json", "notes.md", "page.html", "logo.svg", "bundle.zip"];
+      const host = document.getElementById("viewer");
+      const log = document.getElementById("log");
+      const theme = document.getElementById("theme");
+      const limit = document.getElementById("limit");
+      let viewer = null;
+      let lastSource = null;
+
+      function write(line) {
+        const time = new Date().toLocaleTimeString();
+        log.textContent = `${time}  ${line}\n${log.textContent}`.slice(0, 8000);
+      }
+
+      function build() {
+        viewer?.destroy();
+        let started = 0;
+        viewer = createFileViewer(host, {
+          theme: theme.value,
+          maxBytes: Math.max(0.01, Number(limit.value) || 50) * 1024 * 1024,
+          pdf: { workerSrc: "/node_modules/pdfjs-dist/build/pdf.worker.min.mjs" },
+          onLoad: (file) => write(`shown  ${file.kind}  ${file.name}  (${Math.round(performance.now() - started)} ms)`),
+          onError: (error, file) => write(`ERROR  ${error.code}  ${file?.name ?? ""}  ${error.message}`),
+        });
+        const open = viewer.open.bind(viewer);
+        viewer.open = (source) => {
+          started = performance.now();
+          lastSource = source;
+          write(`open   ${source.name ?? source.url ?? "file"}`);
+          return open(source);
+        };
+        if (lastSource) void viewer.open(lastSource);
+      }
+
+      for (const name of SAMPLES) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = name;
+        button.addEventListener("click", () => viewer.open({ url: `/demo/samples/${name}` }));
+        document.getElementById("samples").append(button);
+      }
+
+      document.getElementById("picker").addEventListener("change", (event) => {
+        const file = event.target.files?.[0];
+        if (file) void viewer.open({ file });
+        event.target.value = "";
+      });
+
+      const drop = document.getElementById("drop");
+      drop.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        drop.classList.add("over");
+      });
+      drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+      drop.addEventListener("drop", (event) => {
+        event.preventDefault();
+        drop.classList.remove("over");
+        const file = event.dataTransfer?.files?.[0];
+        if (file) void viewer.open({ file });
+      });
+
+      const urlInput = document.getElementById("url");
+      const openUrl = () => urlInput.value.trim() && viewer.open({ url: urlInput.value.trim() });
+      document.getElementById("open-url").addEventListener("click", openUrl);
+      urlInput.addEventListener("keydown", (event) => event.key === "Enter" && openUrl());
+
+      theme.addEventListener("change", build);
+      limit.addEventListener("change", build);
+      build();
+
+      // ?open=/demo/samples/report.xlsx opens a file on load (handy for sharing a test link).
+      const autoOpen = new URLSearchParams(location.search).get("open");
+      if (autoOpen) void viewer.open({ url: autoOpen });
+    </script>
+  </body>
+</html>
